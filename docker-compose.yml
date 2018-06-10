@@ -1,0 +1,37 @@
+version: '2'
+services:
+  xf2-php-fpm:
+    build:
+      context: ./
+      dockerfile: ./docker/xf2-php-fpm.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=database"
+
+  xf2-nginx:
+    build:
+      context: ./
+      dockerfile: ./docker/xf2-nginx.dockerfile
+    working_dir: /var/www
+    volumes_from:
+      - xf2-php-fpm
+    ports:
+      - 8585:80
+
+  xf2-database:
+    image: mariadb:10.3
+    volumes:
+      - xf2dbdata:/var/lib/mysql
+    environment:
+      - "MYSQL_DATABASE=homestead"
+      - "MYSQL_USER=homestead"
+      - "MYSQL_PASSWORD=secret"
+      - "MYSQL_ROOT_PASSWORD=secret"
+    ports:
+      - "33061:3306"
+
+volumes:
+  xf2dbdata:
